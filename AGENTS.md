@@ -1,0 +1,1 @@
+프로젝트의 목적, MVP 범위, 제품 원칙은 `docs/project-context.md`를 우선 참고한다.
