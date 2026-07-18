@@ -92,18 +92,16 @@ function ChannelOption({
 export function ConsentPage() {
   const navigate = useNavigate();
   const [selections, setSelections] = useState(initialSelections);
-  const [submitted, setSubmitted] = useState(false);
 
   const updateSelection = (name: SelectionKey, checked: boolean) => {
     setSelections((current) => ({ ...current, [name]: checked }));
-    setSubmitted(false);
   };
 
   const allSelected = Object.values(selections).every(Boolean);
 
   return (
     <div className="mobile-prototype bg-[#F7F8F8]">
-      <AppHeader />
+      <AppHeader backTo="/events/phishing-challenge/intro" />
 
       <main className="bg-[#F7F8F8] pb-[82px] text-center">
         <section className="h-[661px] px-5 pt-[25px]">
@@ -175,7 +173,7 @@ export function ConsentPage() {
           <button
             type="button"
             disabled={!allSelected}
-            onClick={() => setSubmitted(true)}
+            onClick={() => navigate("/events/phishing-challenge/setup")}
             className="mt-[28px] h-[51px] w-[300px] rounded-[10px] border border-[#087C6E] bg-[#08A78F] font-['Jua'] text-[22px] tracking-[-0.5px] text-white shadow-[0_4px_6px_rgba(27,57,51,0.22)] transition disabled:cursor-not-allowed disabled:border-[#A7B1AF] disabled:bg-[#B9C3C1] active:translate-y-0.5"
           >
             챌린지 하러가기
@@ -191,7 +189,7 @@ export function ConsentPage() {
           </button>
         </section>
 
-        <section className="min-h-[520px] bg-[#4A4747] px-5 pt-[30px] pb-[36px] text-white">
+        <section className="min-h-[450px] bg-[#4A4747] px-5 pt-[30px] pb-[36px] text-white">
           <h2 className="text-[21px] leading-[29px] font-bold tracking-[-0.6px]">
             꼭 기억해주세요
           </h2>
@@ -207,15 +205,6 @@ export function ConsentPage() {
           </div>
         </section>
       </main>
-
-      {submitted ? (
-        <p
-          role="status"
-          className="fixed bottom-[94px] left-1/2 z-[60] w-[calc(100%_-_40px)] max-w-[350px] -translate-x-1/2 rounded-xl bg-[#1F3E38] px-4 py-3 text-center text-[14px] font-medium text-white shadow-lg"
-        >
-          데모는 개인정보 동의 화면까지 제공됩니다.
-        </p>
-      ) : null}
 
       <BottomTabBar />
     </div>

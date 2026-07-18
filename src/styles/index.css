@@ -55,6 +55,11 @@
 html {
   min-width: 320px;
   background: #eef1f0;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -86,17 +91,18 @@ button {
 
 .brand-mark {
   position: relative;
-  width: 30px;
-  height: 22px;
+  width: 36px;
+  height: 38px;
   flex: 0 0 auto;
   overflow: hidden;
 }
 
 .brand-mark > img {
   position: absolute;
-  top: -9.5px;
-  left: -10.8px;
-  width: 53px;
+  top: -0.88%;
+  left: -25%;
+  width: 161.11%;
+  height: 101.75%;
   max-width: none;
 }
 

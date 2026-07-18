@@ -51,9 +51,9 @@ export function ServiceIntroPage() {
 
   return (
     <div className="mobile-prototype bg-[#F7F8F8]">
-      <AppHeader />
+      <AppHeader backTo="/invites/phishing-challenge/demo" />
 
-      <main className="min-h-[786px] bg-[#F7F8F8] pb-[136px] text-center">
+      <main className="min-h-[786px] bg-[#F7F8F8] text-center">
         <section className="pt-[12px]">
           <p className="text-[18px] leading-[24px] font-bold tracking-[-0.5px] text-[#02B7AF]">
             AI 피싱 예방 챌린지
@@ -118,7 +118,7 @@ export function ServiceIntroPage() {
           </article>
         </section>
 
-        <section className="mt-[16px] bg-white px-[39px] pt-[25px] pb-[14px]">
+        <section className="mt-[16px] bg-white px-[39px] pt-[25px] pb-[96px]">
           <label className="flex cursor-pointer items-center gap-[9px] text-left">
             <input
               type="checkbox"

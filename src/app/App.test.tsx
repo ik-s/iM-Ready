@@ -1,4 +1,10 @@
-import { render, screen, within } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
@@ -6,7 +12,9 @@ import { describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 
 describe("challenge onboarding routes", () => {
-  it("renders the shared challenge landing from an invite URL", () => {
+  it("renders the shared challenge landing with a brand link to home", async () => {
+    const user = userEvent.setup();
+
     render(
       <MemoryRouter initialEntries={["/invites/phishing-challenge/demo"]}>
         <App />
@@ -16,14 +24,28 @@ describe("challenge onboarding routes", () => {
     expect(
       screen.getByRole("heading", { name: "AI 피싱 예방 챌린지" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("iM Shield")).toBeInTheDocument();
+    const homeButton = screen.getByRole("button", {
+      name: "홈으로 이동",
+    });
+    expect(homeButton).toHaveTextContent("iM Ready");
+    expect(screen.queryByText("iM Shield")).not.toBeInTheDocument();
 
     const navigation = screen.getByRole("navigation", {
       name: "주요 메뉴",
     });
-    for (const label of ["홈", "면역력", "이벤트", "가족", "마이"]) {
+    for (const label of ["홈", "상품", "백신", "골든", "전체"]) {
       expect(within(navigation).getByText(label)).toBeInTheDocument();
     }
+    expect(
+      within(navigation).getByRole("button", { name: "백신" }),
+    ).toHaveAttribute("aria-current", "page");
+    expect(navigation.querySelectorAll("svg")).toHaveLength(5);
+    expect(navigation.querySelectorAll("img")).toHaveLength(0);
+
+    await user.click(homeButton);
+    expect(
+      screen.getByRole("heading", { name: "이번달 피싱 예방 결과" }),
+    ).toBeInTheDocument();
   });
 
   it("moves from the shared challenge page to the service introduction", async () => {
@@ -91,6 +113,24 @@ describe("challenge onboarding routes", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps the service introduction scroll reserve inside the white action section", () => {
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/intro"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    const acknowledgement = screen.getByRole("checkbox", {
+      name: "개인정보 활용 및 훈련 안내를 확인했습니다.",
+    });
+    const actionSection = acknowledgement.closest("section");
+
+    expect(actionSection).toHaveClass("bg-white", "pb-[96px]");
+    expect(screen.getByRole("main")).not.toHaveClass("pb-[136px]");
+  });
+
   it("shows the consent controls and the replacement safe-training terms", () => {
     render(
       <MemoryRouter
@@ -145,5 +185,1008 @@ describe("challenge onboarding routes", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.queryByText(/약관약관/)).not.toBeInTheDocument();
+  });
+
+  it("keeps the consent training notice compact above the bottom navigation", () => {
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/consent"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    const noticeSection = screen
+      .getByRole("heading", { name: "꼭 기억해주세요" })
+      .closest("section");
+
+    expect(noticeSection).toHaveClass("min-h-[450px]", "pb-[36px]");
+  });
+
+  it("moves from consent to the challenge training settings", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/consent"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "챌린지 하러가기" }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "나의 정보" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "훈련 설정" }),
+    ).toBeInTheDocument();
+  });
+
+  it("lets the user configure training and confirms completion in a popup", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/setup"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    const noNotice = screen.getByRole("radio", {
+      name: "알림 없이 진행",
+    });
+    const advanceNotice = screen.getByRole("radio", {
+      name: "미리 알림 받기",
+    });
+    expect(noNotice).toBeChecked();
+
+    await user.click(advanceNotice);
+    expect(advanceNotice).toBeChecked();
+
+    const levelTwo = screen.getByRole("button", {
+      name: /Level 2 실전형/,
+    });
+    const levelThree = screen.getByRole("button", {
+      name: /Level 3 고난도형/,
+    });
+    expect(levelTwo).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(levelThree);
+    expect(levelThree).toHaveAttribute("aria-pressed", "true");
+
+    const guardianMonitoring = screen.getByRole("checkbox", {
+      name: "보호자 모니터링",
+    });
+    expect(guardianMonitoring).toBeChecked();
+
+    await user.click(guardianMonitoring);
+    expect(guardianMonitoring).not.toBeChecked();
+
+    await user.click(
+      screen.getByRole("button", { name: "설정 완료하기" }),
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "설정 완료",
+    });
+    expect(dialog).toHaveTextContent(
+      "설정이 완료됐습니다! 훈련 기간동안 무작위 문자 혹은 전화가 발송될 예정입니다.",
+    );
+
+    await user.click(
+      within(dialog).getByRole("button", { name: "확인" }),
+    );
+    expect(
+      screen.queryByRole("dialog", { name: "설정 완료" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps the setup header fixed and centers only the profile identity", () => {
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/setup"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("banner")).toHaveClass("fixed", "top-0");
+    expect(screen.queryByText("어쩌구 저쩌구")).not.toBeInTheDocument();
+
+    const profile = screen.getByRole("region", {
+      name: "사용자 정보",
+    });
+    expect(
+      within(profile).getByText("홍길동 님").parentElement,
+    ).toHaveClass("flex", "items-center");
+  });
+
+  it("renders the SMS-only phishing warning without app chrome", () => {
+    render(
+      <MemoryRouter initialEntries={["/training/phishing/demo"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "잠깐!" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("당신은 피싱에 걸릴 뻔했어요!"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("이 링크는 iM의 피싱 예방 훈련 링크입니다."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("main", { name: "피싱 훈련 안내" }),
+    ).toHaveClass("justify-center");
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["/events/phishing-challenge/intro", "AI 피싱 예방 챌린지"],
+    [
+      "/events/phishing-challenge/consent",
+      "함께하면 더 안전해져요!",
+    ],
+    [
+      "/events/phishing-challenge/setup",
+      "개인 정보 수신 동의 여부 확인",
+    ],
+  ])(
+    "moves back from %s to its logical parent",
+    async (path, destinationHeading) => {
+      const user = userEvent.setup();
+
+      render(
+        <MemoryRouter initialEntries={[path]}>
+          <App />
+        </MemoryRouter>,
+      );
+
+      await user.click(
+        screen.getByRole("button", { name: "이전 화면" }),
+      );
+      expect(
+        screen.getByRole("heading", {
+          name: destinationHeading,
+        }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it.each([
+    "/invites/phishing-challenge/demo",
+    "/training/phishing/demo",
+  ])("does not add app back navigation to %s", (path) => {
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "이전 화면" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("home report and golden time routes", () => {
+  it("lets the home report header scroll away with the page", () => {
+    render(
+      <MemoryRouter initialEntries={["/home"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("banner")).toHaveClass("relative");
+    expect(screen.getByRole("banner")).not.toHaveClass("fixed");
+    expect(screen.getByRole("banner")).not.toHaveClass("sticky");
+  });
+
+  it("fades the home background from mint to white over 653 pixels", () => {
+    render(
+      <MemoryRouter initialEntries={["/home"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId("home-background-gradient")).toHaveClass(
+      "h-[653px]",
+      "from-[#D9F0EB]",
+      "to-white",
+    );
+  });
+
+  it("keeps the report actions in the document flow", () => {
+    render(
+      <MemoryRouter initialEntries={["/home"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    const reportActions = screen.getByRole("region", {
+      name: "리포트 작업",
+    });
+    expect(reportActions).not.toHaveClass("fixed");
+    expect(screen.getByRole("main")).toContainElement(reportActions);
+  });
+
+  it("dismisses the report notice when the user clicks elsewhere", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/home"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "가족·친구한테 공유하기",
+      }),
+    );
+    expect(
+      screen.getByText("가족·친구 공유 링크를 준비했어요."),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("heading", {
+        name: "이번달 피싱 예방 결과",
+      }),
+    );
+    expect(
+      screen.queryByText("가족·친구 공유 링크를 준비했어요."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("automatically dismisses the report notice after three seconds", () => {
+    vi.useFakeTimers();
+
+    try {
+      render(
+        <MemoryRouter initialEntries={["/home"]}>
+          <App />
+        </MemoryRouter>,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: "가족·친구한테 공유하기",
+        }),
+      );
+      expect(
+        screen.getByText("가족·친구 공유 링크를 준비했어요."),
+      ).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(3_000);
+      });
+      expect(
+        screen.queryByText("가족·친구 공유 링크를 준비했어요."),
+      ).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("uses the same bottom navigation position on home and vaccine", () => {
+    const home = render(
+      <MemoryRouter initialEntries={["/home"]}>
+        <App />
+      </MemoryRouter>,
+    );
+    const homeNavigation = screen.getByRole("navigation", {
+      name: "주요 메뉴",
+    });
+    expect(homeNavigation).toHaveStyle({ bottom: "0px" });
+
+    home.unmount();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/setup"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+    expect(
+      screen.getByRole("navigation", { name: "주요 메뉴" }),
+    ).toHaveStyle({ bottom: "0px" });
+  });
+
+  it("opens the monthly report from the setup home tab", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/setup"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      within(
+        screen.getByRole("navigation", { name: "주요 메뉴" }),
+      ).getByRole("button", { name: "홈" }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "이번달 피싱 예방 결과" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "홈" }),
+    ).toHaveAttribute("aria-current", "page");
+  });
+
+  it("opens golden time from the report bottom tab", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/home"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      within(
+        screen.getByRole("navigation", { name: "주요 메뉴" }),
+      ).getByRole("button", { name: "골든" }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "보이스피싱 긴급 대응" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "골든" }),
+    ).toHaveAttribute("aria-current", "page");
+  });
+
+  it("uses honest guidance copy and opens the recent detection examples", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByText("필요한 보호·신고 절차를 순서대로 안내합니다."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("실시간 골든타임 보호 중"),
+    ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "긴급 대응 시작하기" }),
+    );
+    await user.click(screen.getByRole("button", { name: "전체보기" }));
+
+    expect(
+      screen.getByRole("dialog", { name: "최근 보안 안내 예시" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /휴대전화 활동이나 메시지를 읽지 않았습니다\./,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("resolves the local voice answer simulation and selects an answer", () => {
+    vi.useFakeTimers();
+
+    try {
+      render(
+        <MemoryRouter initialEntries={["/golden-time/assessment"]}>
+          <App />
+        </MemoryRouter>,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "음성으로 답하기" }),
+      );
+      expect(
+        screen.getByRole("button", { name: "답변을 확인하고 있어요" }),
+      ).toBeDisabled();
+
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+
+      expect(
+        screen.getByRole("radio", { name: /방금 \(30분 이내\)/ }),
+      ).toBeChecked();
+      expect(
+        screen.getByText("‘방금’으로 답변을 선택했습니다."),
+      ).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("requires payment-stop guidance acknowledgement before follow-up", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time/payment-stop"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "지급정지 절차 확인하기",
+      }),
+    );
+
+    expect(
+      screen.getByRole("dialog", { name: "지급정지 절차 안내" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "이 데모에서는 실제 지급정지 신청이나 금융거래가 발생하지 않습니다.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: "공식 채널로 직접 확인하세요",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "후속 절차 가이드" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "안내를 확인하고 계속하기",
+      }),
+    );
+    expect(
+      screen.getByRole("heading", { name: "후속 절차 가이드" }),
+    ).toBeInTheDocument();
+  });
+
+  it("opens the official payment-stop method from the information card", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time/payment-stop"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /계좌 및 카드 지급정지 절차/,
+      }),
+    );
+    expect(
+      screen.getByRole("dialog", {
+        name: "공식 지급정지 요청 방법",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/다른 안전한 기기에서 iM뱅크 공식 앱/),
+    ).toBeInTheDocument();
+  });
+
+  it("opens follow-up checklist guidance and shows an honest prevention card", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "사건사고사실확인원 발급 안내",
+      }),
+    );
+    expect(
+      screen.getByRole("dialog", {
+        name: "사건사고사실확인원 발급 안내",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "추가 피해 예방 체크" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("img", {
+        name: "보안 설정이 완료되었습니다",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("provides document and police guidance without pretending to download or locate", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time/incidents"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "피해구제 신청서 안내 보기",
+      }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "피해구제 신청서 안내" }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "닫기" }));
+
+    await user.click(
+      screen.getByRole("button", { name: "가까운 경찰서 찾기" }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "경찰서 방문 안내" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/현재 위치는 사용하지 않았습니다\./),
+    ).toBeInTheDocument();
+  });
+
+  it("confirms timeline completion once and exposes semantic progress", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/golden-time/incidents/current"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "57",
+    );
+    await user.click(
+      screen.getByRole("button", { name: "이 단계 완료 표시" }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "단계 완료 확인" }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "완료로 표시하기" }),
+    );
+
+    expect(
+      screen.getByRole("button", { name: "완료 표시됨" }),
+    ).toBeDisabled();
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "71",
+    );
+    expect(
+      screen.getByText("사건사고사실확인원 단계를 완료로 표시했습니다."),
+    ).toBeInTheDocument();
+  });
+
+  it("opens official support guidance from the incident timeline", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/golden-time/incidents/current"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "문의하기" }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "공식 상담 채널 안내" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/금융감독원 1332/)).toBeInTheDocument();
+  });
+
+  it("keeps completed refund data consistent and removes score and location copy", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time/history"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByText("4,250,000원 환급 완료"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/보안 등급|인상 \+5pt/)).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: /기관사칭 피싱 방어/ }),
+    );
+    expect(screen.getByText("4,250,000")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "접수 및 처리 기관" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("사건 발생 위치")).not.toBeInTheDocument();
+    expect(screen.queryByText("대구광역시 수성구")).not.toBeInTheDocument();
+  });
+
+  it("opens record-specific education and settings review modes", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time/history"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: /대출사기 예방 교육/ }),
+    );
+    expect(
+      screen.getByRole("heading", { name: "대출사기 예방 교육 복기" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("원격제어 요구까지 진행됐습니다."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps the training review free of legacy branding and security scores", () => {
+    render(
+      <MemoryRouter
+        initialEntries={[
+          "/golden-time/history/training-review?record=training",
+        ]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "공식 앱에서 직접 확인할 설정",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("img", {
+        name: "보안 강화 리포트 작성 중",
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/보안 점수|98점/)).not.toBeInTheDocument();
+  });
+
+  it("keeps security settings as guidance-only local interactions", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          "/golden-time/history/training-review?record=settings",
+        ]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "사전 방어 설정 안내" }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", {
+        name: "지연이체 설정 안내 보기",
+      }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "지연이체 설정 안내" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/이 데모는 설정을 변경하지 않습니다/),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "안내 확인 완료" }),
+    );
+    expect(
+      screen.getByText("지연이체 설정 안내를 확인했습니다."),
+    ).toBeInTheDocument();
+  });
+
+  it("gives feedback for shared placeholder navigation controls", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "알림" }));
+    expect(
+      screen.getByText("새로운 알림은 아직 없습니다."),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "상품" }));
+    expect(
+      screen.getByText("상품 메뉴는 데모 준비 중입니다."),
+    ).toBeInTheDocument();
+  });
+
+  it("does not show the training banner on the golden time start page", () => {
+    render(
+      <MemoryRouter initialEntries={["/golden-time/start"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.queryByText("이것은 훈련입니다."),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "괜찮습니다." }),
+    ).toBeInTheDocument();
+  });
+
+  it("dismisses the follow-up document notice when the user clicks elsewhere", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "피해경위서 자동 작성" }),
+    );
+    expect(
+      screen.getByText("피해경위서 작성 예시를 준비했습니다."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("데모용 피해경위서를 자동으로 작성했습니다."),
+    ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("heading", { name: "후속 절차 가이드" }),
+    );
+    expect(
+      screen.queryByText("피해경위서 작성 예시를 준비했습니다."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps the follow-up document notice visible through its trigger pointer sequence", () => {
+    render(
+      <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    const createDocumentButton = screen.getByRole("button", {
+      name: "피해경위서 자동 작성",
+    });
+    fireEvent.click(createDocumentButton);
+    fireEvent.pointerDown(createDocumentButton);
+
+    expect(
+      screen.getByText("피해경위서 작성 예시를 준비했습니다."),
+    ).toBeInTheDocument();
+  });
+
+  it("arms follow-up notice outside dismissal after the trigger gesture completes", () => {
+    vi.useFakeTimers();
+
+    try {
+      render(
+        <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
+          <App />
+        </MemoryRouter>,
+      );
+
+      const createDocumentButton = screen.getByRole("button", {
+        name: "피해경위서 자동 작성",
+      });
+      const pageHeading = screen.getByRole("heading", {
+        name: "후속 절차 가이드",
+      });
+
+      fireEvent.click(createDocumentButton);
+      fireEvent.pointerDown(pageHeading);
+      expect(
+        screen.getByText("피해경위서 작성 예시를 준비했습니다."),
+      ).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(0);
+      });
+      fireEvent.pointerDown(pageHeading);
+      expect(
+        screen.queryByText("피해경위서 작성 예시를 준비했습니다."),
+      ).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("automatically dismisses the follow-up document notice after three seconds", () => {
+    vi.useFakeTimers();
+
+    try {
+      render(
+        <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
+          <App />
+        </MemoryRouter>,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: "피해경위서 자동 작성",
+        }),
+      );
+      expect(
+        screen.getByText("피해경위서 작성 예시를 준비했습니다."),
+      ).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(3_000);
+      });
+      expect(
+        screen.queryByText("피해경위서 작성 예시를 준비했습니다."),
+      ).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("labels the follow-up incident entry as an active phishing response", () => {
+    render(
+      <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "진행 중인 사건 진행 중인 피싱 대응 조회",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("명의도용 확인 (payinfo)"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("내 명의 계좌 통합 조회"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("returns from incidents to follow-up when opened from follow-up", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "진행 중인 사건 진행 중인 피싱 대응 조회",
+      }),
+    );
+    expect(
+      screen.getByRole("heading", { name: "진행 중 사건" }),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "이전 화면" }),
+    );
+    expect(
+      screen.getByRole("heading", { name: "후속 절차 가이드" }),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    ["/golden-time", "이번달 피싱 예방 결과"],
+    ["/golden-time/start", "보이스피싱 긴급 대응"],
+    ["/golden-time/assessment", "괜찮습니다."],
+    ["/golden-time/payment-stop", "언제 송금하셨나요?"],
+    ["/golden-time/follow-up", "상황을 파악했습니다."],
+    ["/golden-time/incidents", "보이스피싱 긴급 대응"],
+    ["/golden-time/incidents/current", "진행 중 사건"],
+    ["/golden-time/history", "보이스피싱 긴급 대응"],
+    ["/golden-time/history/refund-report", "지난 기록"],
+    ["/golden-time/history/training-review", "지난 기록"],
+  ])(
+    "moves back from %s to its logical parent",
+    async (path, parentHeading) => {
+      const user = userEvent.setup();
+
+      render(
+        <MemoryRouter initialEntries={[path]}>
+          <App />
+        </MemoryRouter>,
+      );
+
+      await user.click(
+        screen.getByRole("button", { name: "이전 화면" }),
+      );
+      expect(
+        screen.getByRole("heading", { name: parentHeading }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it("traverses the primary golden time response flow", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "긴급 대응 시작하기" }),
+    );
+    expect(
+      screen.getByRole("heading", { name: "괜찮습니다." }),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "대응 프로세스 시작하기",
+      }),
+    );
+    expect(
+      screen.getByRole("heading", {
+        name: "언제 송금하셨나요?",
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("radio", { name: /방금 \(30분 이내\)/ }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "다음 단계로" }),
+    );
+    expect(
+      screen.getByRole("heading", { name: "상황을 파악했습니다." }),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "지급정지 절차 확인하기",
+      }),
+    );
+    await user.click(
+      screen.getByRole("button", {
+        name: "안내를 확인하고 계속하기",
+      }),
+    );
+    expect(
+      screen.getByRole("heading", { name: "후속 절차 가이드" }),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    ["/golden-time/incidents", "진행 중 사건"],
+    ["/golden-time/incidents/current", "보이스피싱 피해 회복 중"],
+    ["/golden-time/history", "지난 기록"],
+    ["/golden-time/history/refund-report", "피해 환급 상세 보고서"],
+    ["/golden-time/history/training-review", "Analysis Report"],
+  ])("renders %s directly", (path, heading) => {
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: heading }),
+    ).toBeInTheDocument();
   });
 });
