@@ -163,7 +163,7 @@ export function SituationAssessmentPage() {
           {voiceState === "done"
             ? "‘방금’으로 답변을 선택했습니다."
             : voiceState === "processing"
-              ? "데모 음성 답변을 처리하고 있습니다."
+              ? "음성 답변을 확인하고 있습니다."
               : ""}
         </p>
       </section>

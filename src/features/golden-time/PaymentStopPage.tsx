@@ -1,12 +1,12 @@
 import {
   PiCaretRight,
   PiQuestion,
-  PiShieldCheck,
   PiWarning,
 } from "react-icons/pi";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
+import paymentStopBanner from "../../assets/figma/golden-time/payment-stop-banner.jpg";
 import { GoldenActionSheet } from "./GoldenFeedback";
 import {
   GoldenDivider,
@@ -30,7 +30,7 @@ export function PaymentStopPage() {
           상황을 파악했습니다.
         </h1>
         <p className="mt-2 text-[16px] leading-6 text-[#3C4A45]">
-          피해 확산을 막기 위한 공식 절차를 확인해 주세요.
+          피해 확산을 막기 위해 즉시 조치합니다.
         </p>
       </section>
 
@@ -50,10 +50,10 @@ export function PaymentStopPage() {
         >
           <div>
             <p className="text-[14px] font-semibold">
-              계좌 및 카드 지급정지 절차
+              계좌 및 카드 즉시 차단
             </p>
             <p className="mt-1 text-[12px] text-[#3C4A45]">
-              공식 앱·고객센터에서 요청
+              앱에서 바로 신청 가능
             </p>
           </div>
           <PiCaretRight className="h-5 w-5 text-[#3C4A45]" />
@@ -68,8 +68,7 @@ export function PaymentStopPage() {
             <p className="mt-1 text-[14px] leading-[23px] text-[#3C4A45]">
               악성 앱은 112, 은행 등 모든 통화를 가로챌 수 있습니다.
               <br />
-              다른 안전한 기기에서 공식 앱이나 공식 번호를 직접
-              확인하는 것이 안전합니다.
+              앱 보안망을 통한 신청이 가장 안전합니다.
             </p>
           </div>
         </div>
@@ -91,56 +90,34 @@ export function PaymentStopPage() {
       </section>
 
       <section className="p-5">
-        <div className="rounded-[14px] border border-[#CDE7E1] bg-gradient-to-br from-[#EAFBF7] to-white p-4">
-          <div className="flex items-start gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-[#029C82] shadow-sm">
-              <PiShieldCheck className="h-6 w-6" />
-            </span>
-            <div>
-              <h2 className="text-[16px] font-bold">
-                공식 채널로 직접 확인하세요
-              </h2>
-              <p className="mt-1 text-[12px] leading-[18px] text-[#3C4A45]">
-                문자 속 링크나 전달받은 번호는 사용하지 않습니다.
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-[12px] font-semibold">
-            {["iM뱅크 공식 앱", "경찰청 112", "금감원 1332"].map(
-              (channel) => (
-                <span
-                  key={channel}
-                  className="rounded-[8px] bg-white px-2 py-2"
-                >
-                  {channel}
-                </span>
-              ),
-            )}
-          </div>
-        </div>
+        <img
+          src={paymentStopBanner}
+          alt="iM Shield 실시간 보호 안내"
+          className="h-[160px] w-full rounded-[12px] border border-[#DDE6E3] object-cover"
+        />
       </section>
 
       <GoldenFixedAction
         onClick={() => setSheet("confirm")}
       >
-        지급정지 절차 확인하기
+        즉시 지급정지 신청하기
       </GoldenFixedAction>
 
       <GoldenActionSheet
         open={sheet !== null}
         title={
           sheet === "details"
-            ? "공식 지급정지 요청 방법"
-            : "지급정지 절차 안내"
+            ? "지급정지 신청 방법"
+            : "지급정지 신청 안내"
         }
         description={
           sheet === "details"
-            ? "다른 안전한 기기에서 iM뱅크 공식 앱 또는 카드 뒷면·공식 홈페이지에 안내된 고객센터 번호를 직접 확인해 요청하세요."
-            : "이 데모에서는 실제 지급정지 신청이나 금융거래가 발생하지 않습니다."
+            ? "iM뱅크 공식 앱의 보안 메뉴에서 지급정지를 선택하고 계좌와 카드를 확인한 뒤 신청해 주세요."
+            : "iM뱅크 공식 앱에서 계좌 및 카드 지급정지를 신청해 주세요. 신청을 마친 뒤 후속 절차를 이어갈 수 있습니다."
         }
         primaryLabel={
           sheet === "confirm"
-            ? "안내를 확인하고 계속하기"
+            ? "신청 완료 후 계속하기"
             : undefined
         }
         onPrimary={
@@ -152,8 +129,8 @@ export function PaymentStopPage() {
       >
         {sheet === "confirm" ? (
           <div className="rounded-[10px] bg-[#FFF5F5] p-3 text-[13px] leading-5 text-[#7A2424]">
-            실제 피해가 의심되면 즉시 공식 은행 채널과 112를 이용해
-            주세요. 이 버튼은 다음 안내 화면으로만 이동합니다.
+            지급정지 신청이 완료되지 않았다면 iM뱅크 공식 앱에서
+            먼저 신청해 주세요.
           </div>
         ) : null}
       </GoldenActionSheet>

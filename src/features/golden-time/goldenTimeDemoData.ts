@@ -39,7 +39,7 @@ export const recentDetectionExamples: DetectionExample[] = [
     title: "의심 거래 안내",
     time: "오후 2:30",
     description:
-      "해외 IP 로그인처럼 확인이 필요한 상황을 예시로 보여드립니다.",
+      "해외 IP 로그인처럼 확인이 필요한 상황의 대응 방법을 안내합니다.",
   },
   {
     id: "message",
@@ -47,7 +47,7 @@ export const recentDetectionExamples: DetectionExample[] = [
     title: "스미싱 의심 문자",
     time: "오전 11:15",
     description:
-      "출처가 불분명한 URL이 포함된 문자의 대응 예시입니다.",
+      "출처가 불분명한 URL이 포함된 문자의 대응 방법을 안내합니다.",
   },
   {
     id: "call",
@@ -55,7 +55,7 @@ export const recentDetectionExamples: DetectionExample[] = [
     title: "보이스피싱 의심 전화",
     time: "어제",
     description:
-      "기관을 사칭하며 송금을 재촉하는 전화의 대응 예시입니다.",
+      "기관을 사칭하며 송금을 재촉하는 전화의 대응 방법을 안내합니다.",
   },
 ];
 

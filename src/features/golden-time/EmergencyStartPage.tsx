@@ -46,7 +46,7 @@ export function EmergencyStartPage() {
 
       <section className="border-b border-[#E8ECEB]">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <h2 className="text-[18px] font-bold">최근 보안 안내 예시</h2>
+          <h2 className="text-[18px] font-bold">최근 보안 안내</h2>
           <button
             type="button"
             onClick={() => setShowDetections(true)}
@@ -89,9 +89,9 @@ export function EmergencyStartPage() {
           안내사항
         </h2>
         <p className="mt-2 text-[12px] leading-[19px] text-[#3C4A45]">
-          이 화면은 대응 절차를 연습하기 위한 데모입니다.
-          실제 피해가 의심되면 112, 금융감독원 1332 또는 이용 중인
-          금융회사의 공식 고객센터로 바로 확인해 주세요.
+          의심 상황이 발생했다면 안내 순서에 따라 공식 채널에서
+          조치해 주세요. 경찰청 112, 금융감독원 1332 또는 이용
+          중인 금융회사의 공식 고객센터를 이용할 수 있습니다.
         </p>
       </section>
 
@@ -103,8 +103,8 @@ export function EmergencyStartPage() {
 
       <GoldenActionSheet
         open={showDetections}
-        title="최근 보안 안내 예시"
-        description="아래 항목은 긴급 대응 흐름을 이해하기 위한 데모 예시입니다. 휴대전화 활동이나 메시지를 읽지 않았습니다."
+        title="최근 보안 안내"
+        description="아래 항목은 최근 주의가 필요한 금융사기 유형과 대응 방법입니다."
         onClose={() => setShowDetections(false)}
       >
         <ul className="space-y-2">

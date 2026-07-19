@@ -549,7 +549,7 @@ describe("home report and golden time routes", () => {
     ).toHaveAttribute("aria-current", "page");
   });
 
-  it("uses honest guidance copy and opens the recent detection examples", async () => {
+  it("uses service-facing guidance copy and opens recent security notices", async () => {
     const user = userEvent.setup();
 
     render(
@@ -571,13 +571,14 @@ describe("home report and golden time routes", () => {
     await user.click(screen.getByRole("button", { name: "전체보기" }));
 
     expect(
-      screen.getByRole("dialog", { name: "최근 보안 안내 예시" }),
+      screen.getByRole("dialog", { name: "최근 보안 안내" }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /휴대전화 활동이나 메시지를 읽지 않았습니다\./,
+        /최근 주의가 필요한 금융사기 유형/,
       ),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/데모|예시/)).not.toBeInTheDocument();
   });
 
   it("resolves the local voice answer simulation and selects an answer", () => {
@@ -596,6 +597,10 @@ describe("home report and golden time routes", () => {
       expect(
         screen.getByRole("button", { name: "답변을 확인하고 있어요" }),
       ).toBeDisabled();
+      expect(
+        screen.getByText("음성 답변을 확인하고 있습니다."),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/데모/)).not.toBeInTheDocument();
 
       act(() => {
         vi.advanceTimersByTime(800);
@@ -623,30 +628,31 @@ describe("home report and golden time routes", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: "지급정지 절차 확인하기",
+        name: "즉시 지급정지 신청하기",
       }),
     );
 
     expect(
-      screen.getByRole("dialog", { name: "지급정지 절차 안내" }),
+      screen.getByRole("dialog", { name: "지급정지 신청 안내" }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "이 데모에서는 실제 지급정지 신청이나 금융거래가 발생하지 않습니다.",
+        /iM뱅크 공식 앱에서 계좌 및 카드 지급정지를 신청해 주세요/,
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", {
-        name: "공식 채널로 직접 확인하세요",
+      screen.getByRole("img", {
+        name: "iM Shield 실시간 보호 안내",
       }),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/데모/)).not.toBeInTheDocument();
     expect(
       screen.queryByRole("heading", { name: "후속 절차 가이드" }),
     ).not.toBeInTheDocument();
 
     await user.click(
       screen.getByRole("button", {
-        name: "안내를 확인하고 계속하기",
+        name: "신청 완료 후 계속하기",
       }),
     );
     expect(
@@ -665,16 +671,16 @@ describe("home report and golden time routes", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: /계좌 및 카드 지급정지 절차/,
+        name: /계좌 및 카드 즉시 차단/,
       }),
     );
     expect(
       screen.getByRole("dialog", {
-        name: "공식 지급정지 요청 방법",
+        name: "지급정지 신청 방법",
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/다른 안전한 기기에서 iM뱅크 공식 앱/),
+      screen.getByText(/iM뱅크 공식 앱의 보안 메뉴/),
     ).toBeInTheDocument();
   });
 
@@ -705,9 +711,21 @@ describe("home report and golden time routes", () => {
         name: "보안 설정이 완료되었습니다",
       }),
     ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "닫기" }));
+    await user.click(
+      screen.getByRole("button", { name: "피해경위서 자동 작성" }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "피해경위서 초안" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/확인된 사건 내용을 바탕으로/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/데모|예시|실제 제출 전/)).not.toBeInTheDocument();
   });
 
-  it("provides document and police guidance without pretending to download or locate", async () => {
+  it("provides production-facing document and police guidance", async () => {
     const user = userEvent.setup();
 
     render(
@@ -724,17 +742,25 @@ describe("home report and golden time routes", () => {
     expect(
       screen.getByRole("dialog", { name: "피해구제 신청서 안내" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/공식 양식을 받아 작성한 뒤/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/데모/)).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "닫기" }));
 
     await user.click(
-      screen.getByRole("button", { name: "가까운 경찰서 찾기" }),
+      screen.getByRole("button", { name: "담당 경찰서 확인하기" }),
     );
     expect(
       screen.getByRole("dialog", { name: "경찰서 방문 안내" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/현재 위치는 사용하지 않았습니다\./),
+      screen.getByText("사건 담당 경찰서"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/방문 전 신분증과 피해 계좌 이체 내역/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/데모|예시|현재 위치/)).not.toBeInTheDocument();
   });
 
   it("confirms timeline completion once and exposes semantic progress", async () => {
@@ -758,6 +784,12 @@ describe("home report and golden time routes", () => {
     expect(
       screen.getByRole("dialog", { name: "단계 완료 확인" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/다음 단계인 금융회사 서면 신청 준비/),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/현재 기기에만 임시로 반영/),
+    ).not.toBeInTheDocument();
     await user.click(
       screen.getByRole("button", { name: "완료로 표시하기" }),
     );
@@ -791,7 +823,12 @@ describe("home report and golden time routes", () => {
     expect(
       screen.getByRole("dialog", { name: "공식 상담 채널 안내" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/금융감독원 1332/)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "피해 상담은 경찰청 112, 금융감독원 1332 또는 이용 중인 금융회사의 공식 고객센터를 이용해 주세요.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/실제 피해 상담|데모/)).not.toBeInTheDocument();
   });
 
   it("keeps completed refund data consistent and removes score and location copy", async () => {
@@ -888,8 +925,9 @@ describe("home report and golden time routes", () => {
       screen.getByRole("dialog", { name: "지연이체 설정 안내" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/이 데모는 설정을 변경하지 않습니다/),
+      screen.getByText(/적용 조건과 시간을 확인한 뒤 설정해 주세요/),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/데모/)).not.toBeInTheDocument();
     await user.click(
       screen.getByRole("button", { name: "안내 확인 완료" }),
     );
@@ -914,7 +952,12 @@ describe("home report and golden time routes", () => {
 
     await user.click(screen.getByRole("button", { name: "상품" }));
     expect(
-      screen.getByText("상품 메뉴는 데모 준비 중입니다."),
+      screen.getByText("상품 메뉴는 준비 중입니다."),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "전체" }));
+    expect(
+      screen.getByText("전체 메뉴는 준비 중입니다."),
     ).toBeInTheDocument();
   });
 
@@ -946,7 +989,7 @@ describe("home report and golden time routes", () => {
       screen.getByRole("button", { name: "피해경위서 자동 작성" }),
     );
     expect(
-      screen.getByText("피해경위서 작성 예시를 준비했습니다."),
+      screen.getByText("피해경위서 초안을 작성했습니다."),
     ).toBeInTheDocument();
     expect(
       screen.queryByText("데모용 피해경위서를 자동으로 작성했습니다."),
@@ -956,7 +999,7 @@ describe("home report and golden time routes", () => {
       screen.getByRole("heading", { name: "후속 절차 가이드" }),
     );
     expect(
-      screen.queryByText("피해경위서 작성 예시를 준비했습니다."),
+      screen.queryByText("피해경위서 초안을 작성했습니다."),
     ).not.toBeInTheDocument();
   });
 
@@ -974,7 +1017,7 @@ describe("home report and golden time routes", () => {
     fireEvent.pointerDown(createDocumentButton);
 
     expect(
-      screen.getByText("피해경위서 작성 예시를 준비했습니다."),
+      screen.getByText("피해경위서 초안을 작성했습니다."),
     ).toBeInTheDocument();
   });
 
@@ -998,7 +1041,7 @@ describe("home report and golden time routes", () => {
       fireEvent.click(createDocumentButton);
       fireEvent.pointerDown(pageHeading);
       expect(
-        screen.getByText("피해경위서 작성 예시를 준비했습니다."),
+        screen.getByText("피해경위서 초안을 작성했습니다."),
       ).toBeInTheDocument();
 
       act(() => {
@@ -1006,7 +1049,7 @@ describe("home report and golden time routes", () => {
       });
       fireEvent.pointerDown(pageHeading);
       expect(
-        screen.queryByText("피해경위서 작성 예시를 준비했습니다."),
+        screen.queryByText("피해경위서 초안을 작성했습니다."),
       ).not.toBeInTheDocument();
     } finally {
       vi.useRealTimers();
@@ -1029,14 +1072,14 @@ describe("home report and golden time routes", () => {
         }),
       );
       expect(
-        screen.getByText("피해경위서 작성 예시를 준비했습니다."),
+        screen.getByText("피해경위서 초안을 작성했습니다."),
       ).toBeInTheDocument();
 
       act(() => {
         vi.advanceTimersByTime(3_000);
       });
       expect(
-        screen.queryByText("피해경위서 작성 예시를 준비했습니다."),
+        screen.queryByText("피해경위서 초안을 작성했습니다."),
       ).not.toBeInTheDocument();
     } finally {
       vi.useRealTimers();
@@ -1159,12 +1202,12 @@ describe("home report and golden time routes", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: "지급정지 절차 확인하기",
+        name: "즉시 지급정지 신청하기",
       }),
     );
     await user.click(
       screen.getByRole("button", {
-        name: "안내를 확인하고 계속하기",
+        name: "신청 완료 후 계속하기",
       }),
     );
     expect(

@@ -150,7 +150,7 @@ export function FollowUpPage() {
           onClick={() => {
             setSheet("document");
             documentNotice.showToast(
-              "피해경위서 작성 예시를 준비했습니다.",
+              "피해경위서 초안을 작성했습니다.",
             );
           }}
           className="mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-[#029C82] font-['Jua'] text-[18px] text-white"
@@ -225,14 +225,14 @@ export function FollowUpPage() {
             ? "사건사고사실확인원 발급 안내"
             : sheet === "written"
               ? "서면 신청 안내"
-              : "피해경위서 작성 예시"
+              : "피해경위서 초안"
         }
         description={
           sheet === "certificate"
             ? "관할 경찰서에서 사건 접수 후 발급 절차와 필요한 신분증·이체내역을 확인하세요."
             : sheet === "written"
               ? "지급정지 요청 후 안내받은 기한 안에 금융회사 영업점에서 피해구제 서면 신청을 진행하세요."
-              : "입력된 민감정보 없이 사건 시점, 사칭 유형, 송금 여부를 정리한 예시입니다. 실제 제출 전에는 공식 기관의 안내를 확인해야 합니다."
+              : "확인된 사건 내용을 바탕으로 사건 시점, 사칭 유형, 송금 여부를 정리했습니다. 내용을 확인하고 필요한 증빙서류를 함께 준비해 주세요."
         }
         onClose={() => setSheet(null)}
       >
@@ -244,7 +244,7 @@ export function FollowUpPage() {
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-[#66736E]">대응 상태</dt>
-              <dd className="font-semibold">공식 절차 확인 중</dd>
+              <dd className="font-semibold">서면 신청 준비 중</dd>
             </div>
           </dl>
         ) : null}

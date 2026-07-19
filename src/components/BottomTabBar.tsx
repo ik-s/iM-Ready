@@ -77,8 +77,8 @@ export function BottomTabBar({
 
                   onNotice?.(
                     tab.id === "product"
-                      ? "상품 메뉴는 데모 준비 중입니다."
-                      : "전체 메뉴는 데모 준비 중입니다.",
+                      ? "상품 메뉴는 준비 중입니다."
+                      : "전체 메뉴는 준비 중입니다.",
                   );
                 }}
                 className={[

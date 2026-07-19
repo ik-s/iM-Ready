@@ -170,7 +170,7 @@ export function ActiveIncidentPage() {
           className="flex h-14 w-full items-center justify-center gap-2 rounded-[8px] bg-[#029C82] font-['Jua'] text-[18px] text-white"
         >
           <PiMapTrifold className="h-5 w-5" />
-          가까운 경찰서 찾기
+          담당 경찰서 확인하기
         </button>
       </div>
 
@@ -185,23 +185,23 @@ export function ActiveIncidentPage() {
         }
         description={
           sheet === "relief"
-            ? "피해구제 신청서는 지급정지를 요청한 금융회사 영업점에서 공식 양식을 확인해 작성합니다. 이 데모는 파일을 다운로드하거나 제출하지 않습니다."
+            ? "피해구제 신청서는 지급정지를 요청한 금융회사 영업점에서 공식 양식을 받아 작성한 뒤, 요청받은 증빙서류와 함께 제출해 주세요."
             : sheet === "certificate"
               ? "사건사고사실확인원은 경찰 신고 후 관할 경찰서의 안내에 따라 발급받습니다. 신분증과 송금·대화 기록을 준비하세요."
-              : "현재 위치는 사용하지 않았습니다. 실제 방문 전에는 경찰청 공식 사이트나 112를 통해 관할 경찰서를 확인하세요."
+              : "사건을 접수한 경찰서와 방문 정보를 확인해 주세요. 방문 전 민원실 운영 시간과 필요한 서류를 확인하면 빠르게 처리할 수 있습니다."
         }
         onClose={() => setSheet(null)}
       >
         {sheet === "police" ? (
           <div className="rounded-[10px] bg-[#F4F8F7] p-3">
             <p className="text-[12px] font-semibold text-[#029C82]">
-              데모 예시
+              사건 담당 경찰서
             </p>
             <p className="mt-1 text-[15px] font-bold text-[#1B1C1C]">
               대구 수성경찰서
             </p>
             <p className="mt-1 text-[12px] leading-[18px]">
-              위치 기반 추천이 아닌 고정된 안내 예시입니다.
+              방문 전 신분증과 피해 계좌 이체 내역을 준비해 주세요.
             </p>
           </div>
         ) : null}

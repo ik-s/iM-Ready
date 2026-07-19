@@ -54,7 +54,7 @@ const reviewModes = {
       </>
     ),
     description:
-      "아래 버튼은 설정 방법만 안내하며 실제 은행 설정을 변경하지 않습니다.",
+      "아래 버튼에서 설정 방법을 확인하고 iM뱅크 공식 앱에서 적용할 수 있습니다.",
     results: [
       ["지연이체", "공식 앱에서 설정"],
       ["입금계좌 지정", "공식 앱에서 설정"],
@@ -194,7 +194,7 @@ export function TrainingReviewPage() {
             <li>• 금융회사 공식 고객센터 번호</li>
           </ul>
           <p className="mt-4 border-t border-[#CFE5E1] pt-4 text-[12px] leading-[18px] text-[#52706A]">
-            이 데모는 설정 상태를 조회하거나 변경하지 않습니다.
+            설정 변경은 iM뱅크 공식 앱에서 진행됩니다.
           </p>
         </div>
       </section>
@@ -208,8 +208,8 @@ export function TrainingReviewPage() {
         }
         description={
           sheet === "delay"
-            ? "iM뱅크 공식 앱의 보안 설정에서 지연이체 적용 조건과 시간을 직접 확인하세요. 이 데모는 설정을 변경하지 않습니다."
-            : "iM뱅크 공식 앱에서 자주 송금하는 계좌를 지정하고, 미지정 계좌 송금 제한 조건을 직접 확인하세요. 이 데모는 계좌정보를 받지 않습니다."
+            ? "iM뱅크 공식 앱의 보안 설정에서 지연이체 적용 조건과 시간을 확인한 뒤 설정해 주세요."
+            : "iM뱅크 공식 앱에서 자주 송금하는 계좌를 지정하고, 미지정 계좌 송금 제한 조건을 확인해 주세요."
         }
         primaryLabel="안내 확인 완료"
         onPrimary={() => {
