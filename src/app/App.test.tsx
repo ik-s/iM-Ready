@@ -1178,6 +1178,17 @@ describe("home report and golden time routes", () => {
     expect(
       screen.queryByText("긴급 대응 절차 안내"),
     ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "다시 긴급 대응하기" }),
+    );
+
+    expect(
+      screen.getByRole("button", { name: "긴급 대응 시작하기" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "진행 중인 사건" }),
+    ).not.toBeInTheDocument();
   });
 
   it.each([

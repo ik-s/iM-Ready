@@ -9,12 +9,15 @@ import {
 import { useNavigate } from "react-router";
 
 import { currentIncident } from "./goldenTimeDemoData";
-import { isEmergencyResponseComplete } from "./goldenTimeSession";
+import {
+  clearEmergencyResponseComplete,
+  isEmergencyResponseComplete,
+} from "./goldenTimeSession";
 import { GoldenDivider, GoldenTimeShell } from "./GoldenTimeShell";
 
 export function GoldenTimeHomePage() {
   const navigate = useNavigate();
-  const [hasActiveIncident] = useState(() =>
+  const [hasActiveIncident, setHasActiveIncident] = useState(() =>
     isEmergencyResponseComplete(),
   );
 
@@ -147,6 +150,20 @@ export function GoldenTimeHomePage() {
         </div>
         <PiShieldCheck className="ml-auto h-5 w-5 text-[#029C82]" />
       </div>
+
+      {hasActiveIncident ? (
+        <button
+          type="button"
+          onClick={() => {
+            clearEmergencyResponseComplete();
+            setHasActiveIncident(false);
+          }}
+          className="mb-6 block w-full text-center text-[19px] leading-[28px] font-semibold tracking-[-0.5px] text-[#6A6A6A]"
+        >
+          <span className="mx-auto mb-[7px] block h-px w-[63px] bg-[#9D9D9D]" />
+          다시 긴급 대응하기
+        </button>
+      ) : null}
     </GoldenTimeShell>
   );
 }
