@@ -58,12 +58,21 @@ export function IncidentTimelinePage() {
       </h2>
 
       <ol>
-        {currentIncident.completedSteps.map((step) => (
+        {currentIncident.completedSteps.map((step, index) => (
           <li
             key={step.title}
             className="relative flex gap-4 border-b border-[#E8ECEB] px-5 py-6"
           >
-            <span className="absolute top-[42px] bottom-[-25px] left-[37px] w-[2px] bg-[#029C82]" />
+            {index > 0 ? (
+              <span
+                aria-hidden="true"
+                className="absolute top-0 left-[37px] z-0 h-[42px] w-[2px] bg-[#029C82]"
+              />
+            ) : null}
+            <span
+              aria-hidden="true"
+              className="absolute top-[42px] bottom-[-1px] left-[37px] z-0 w-[2px] bg-[#029C82]"
+            />
             <span className="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#029C82] text-white">
               <PiCheck className="h-4 w-4" />
             </span>
@@ -82,7 +91,17 @@ export function IncidentTimelinePage() {
         ))}
 
         <li className="relative flex gap-4 border-b border-[#E8ECEB] bg-[#F1FBF9] px-5 py-6">
-          <span className="absolute top-[42px] bottom-[-25px] left-[37px] w-[2px] bg-[#E8ECEB]" />
+          <span
+            aria-hidden="true"
+            className="absolute top-0 left-[37px] z-0 h-[42px] w-[2px] bg-[#029C82]"
+          />
+          <span
+            aria-hidden="true"
+            className={[
+              "absolute top-[42px] bottom-[-1px] left-[37px] z-0 w-[2px]",
+              marked ? "bg-[#029C82]" : "bg-[#E8ECEB]",
+            ].join(" ")}
+          />
           <span className="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-[#029C82] bg-white text-[#029C82]">
             {marked ? (
               <PiCheck className="h-4 w-4" />
@@ -114,7 +133,14 @@ export function IncidentTimelinePage() {
         </li>
 
         <li className="relative flex gap-4 border-b border-[#E8ECEB] px-5 py-6 opacity-40">
-          <span className="absolute top-[42px] bottom-[-25px] left-[37px] w-[2px] bg-[#E8ECEB]" />
+          <span
+            aria-hidden="true"
+            className="absolute top-0 left-[37px] z-0 h-[42px] w-[2px] bg-[#E8ECEB]"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute top-[42px] bottom-[-1px] left-[37px] z-0 w-[2px] bg-[#E8ECEB]"
+          />
           <span className="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#E8ECEB] bg-[#F7F8F8]">
             <PiFileText className="h-4 w-4" />
           </span>
@@ -126,8 +152,12 @@ export function IncidentTimelinePage() {
           </div>
         </li>
 
-        <li className="flex gap-4 px-5 py-6 opacity-40">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#E8ECEB] bg-[#F7F8F8]">
+        <li className="relative flex gap-4 px-5 py-6 opacity-40">
+          <span
+            aria-hidden="true"
+            className="absolute top-0 left-[37px] z-0 h-[42px] w-[2px] bg-[#E8ECEB]"
+          />
+          <span className="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#E8ECEB] bg-[#F7F8F8]">
             <PiBank className="h-4 w-4" />
           </span>
           <div className="pt-[2px]">
