@@ -16,7 +16,7 @@ export function ShareLandingPage() {
     <div className="mobile-prototype bg-[#66FAD9]">
       <AppHeader />
 
-      <main className="relative min-h-[calc(100dvh-56px)] overflow-hidden bg-[#66FAD9] pb-[150px] text-center">
+      <main className="relative min-h-[calc(100dvh-56px)] overflow-x-hidden bg-[#66FAD9] text-center">
         <img
           src={backgroundShield}
           alt=""
@@ -53,17 +53,6 @@ export function ShareLandingPage() {
           </p>
         </div>
 
-        <div
-          aria-hidden="true"
-          className="absolute top-[266px] left-[-25px] z-[2] h-[246px] w-[419px] overflow-hidden"
-        >
-          <img
-            src={characters}
-            alt=""
-            className="absolute top-[-334px] left-0 w-[419px] max-w-none"
-          />
-        </div>
-
         <img
           src={cloudLarge}
           alt=""
@@ -80,17 +69,33 @@ export function ShareLandingPage() {
           className="absolute top-[251px] left-[-21px] h-[46px] w-[82px]"
         />
 
-        <button
-          type="button"
-          onClick={() => navigate("/events/phishing-challenge/intro")}
-          className="absolute bottom-[122px] left-[9.07%] z-20 h-[55px] w-[80.27%] rounded-[25px] border border-black/35 font-['Jua'] text-[22px] leading-[30px] tracking-[-0.7px] text-black shadow-[-2px_4px_4px_rgba(0,0,0,0.15)] transition active:translate-y-0.5"
-          style={{
-            backgroundImage:
-              "linear-gradient(90deg, rgba(255, 255, 255, 0.45) 0%, rgba(102, 250, 217, 0.45) 100%), linear-gradient(90deg, rgb(0, 193, 163) 0%, rgb(0, 193, 163) 100%)",
-          }}
-        >
-          가족 · 친구랑 챌린지 시작!
-        </button>
+        <section className="relative z-10 mt-[18px] pb-[112px]">
+          <div
+            data-testid="share-characters"
+            aria-hidden="true"
+            className="relative left-1/2 h-[294px] w-[419px] -translate-x-1/2 overflow-hidden"
+          >
+            <img
+              src={characters}
+              alt=""
+              className="absolute top-[-334px] left-0 w-[419px] max-w-none"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/events/phishing-challenge/intro")
+            }
+            className="relative z-20 mx-auto mt-[10px] block h-[55px] w-[80.27%] rounded-[25px] border border-black/35 font-['Jua'] text-[22px] leading-[30px] tracking-[-0.7px] text-black shadow-[-2px_4px_4px_rgba(0,0,0,0.15)] transition active:translate-y-0.5"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, rgba(255, 255, 255, 0.45) 0%, rgba(102, 250, 217, 0.45) 100%), linear-gradient(90deg, rgb(0, 193, 163) 0%, rgb(0, 193, 163) 100%)",
+            }}
+          >
+            가족 · 친구랑 챌린지 시작!
+          </button>
+        </section>
       </main>
 
       <BottomTabBar />

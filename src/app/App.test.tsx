@@ -48,6 +48,27 @@ describe("challenge onboarding routes", () => {
     ).toBeInTheDocument();
   });
 
+  it("places the share CTA after the penguin artwork in normal flow", () => {
+    render(
+      <MemoryRouter
+        initialEntries={["/invites/phishing-challenge/demo"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    const characters = screen.getByTestId("share-characters");
+    const cta = screen.getByRole("button", {
+      name: "가족 · 친구랑 챌린지 시작!",
+    });
+
+    expect(
+      characters.compareDocumentPosition(cta) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(cta).not.toHaveClass("absolute", "fixed");
+  });
+
   it("moves from the shared challenge page to the service introduction", async () => {
     const user = userEvent.setup();
     const scrollTo = vi.fn();
@@ -547,6 +568,26 @@ describe("home report and golden time routes", () => {
     expect(
       screen.getByRole("button", { name: "골든" }),
     ).toHaveAttribute("aria-current", "page");
+  });
+
+  it("opens the phishing challenge demo from the vaccine tab", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/golden-time"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      within(
+        screen.getByRole("navigation", { name: "주요 메뉴" }),
+      ).getByRole("button", { name: "백신" }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "AI 피싱 예방 챌린지" }),
+    ).toBeInTheDocument();
   });
 
   it("uses service-facing guidance copy and opens recent security notices", async () => {

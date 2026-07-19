@@ -29,7 +29,7 @@ const tabs: TabItem[] = [
     id: "vaccine",
     label: "백신",
     icon: PiPill,
-    route: "/events/phishing-challenge/setup",
+    route: "/invites/phishing-challenge/demo",
   },
   {
     id: "golden",
