@@ -1082,6 +1082,21 @@ describe("home report and golden time routes", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows a notice toast when the header bell is pressed outside golden time", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/home"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "알림" }));
+    expect(
+      screen.getByText("새로운 알림은 아직 없습니다."),
+    ).toBeInTheDocument();
+  });
+
   it("does not show the training banner on the golden time start page", () => {
     render(
       <MemoryRouter initialEntries={["/golden-time/start"]}>
