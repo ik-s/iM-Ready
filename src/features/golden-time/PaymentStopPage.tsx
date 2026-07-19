@@ -128,7 +128,7 @@ export function PaymentStopPage() {
         onClose={() => setSheet(null)}
       >
         {sheet === "confirm" ? (
-          <div className="rounded-[10px] bg-[#FFF5F5] p-3 text-[13px] leading-5 text-[#7A2424]">
+          <div className="rounded-[10px] bg-[#FFF5F5] p-3 text-[13px] leading-5 font-bold text-[#7A2424]">
             지급정지 신청이 완료되지 않았다면 iM뱅크 공식 앱에서
             먼저 신청해 주세요.
           </div>
