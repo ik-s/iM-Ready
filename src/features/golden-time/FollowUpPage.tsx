@@ -163,7 +163,7 @@ export function FollowUpPage() {
             markEmergencyResponseComplete();
             navigate("/golden-time");
           }}
-          className="mt-4 flex h-[52px] w-full items-center justify-center rounded-[8px] bg-[#029C82] font-['Jua'] text-[18px] text-white"
+          className="mt-4 flex h-[52px] w-full items-center justify-center rounded-[8px] border border-[#029C82] bg-white font-['Jua'] text-[18px] text-[#029C82]"
         >
           완료하기
         </button>

@@ -91,10 +91,8 @@ export function HomeReportPage() {
             <br />
             예고 없이 찾아옵니다
           </h1>
-          <p className="relative z-10 mt-[7px] text-[10px] leading-[15px] text-[#3C4A45]">
-            계속되는 신종 AI 피싱,
-            <br />
-            함께 대비해요!
+          <p className="relative z-10 mt-[7px] whitespace-nowrap text-[10px] leading-[15px] text-[#3C4A45]">
+            계속되는 신종 AI 피싱, 함께 대비해요!
           </p>
           <img
             src={reportHero}
