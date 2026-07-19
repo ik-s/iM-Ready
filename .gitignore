@@ -11,3 +11,5 @@ test-results/
 design-references/
 docs/
 design-qa.md
+.vercel
+.env*

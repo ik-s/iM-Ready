@@ -1,0 +1,12 @@
+.git
+.npm-cache
+.vite
+.vercel
+coverage
+design-references
+dist
+docs
+node_modules
+playwright-report
+test-results
+*.tsbuildinfo
