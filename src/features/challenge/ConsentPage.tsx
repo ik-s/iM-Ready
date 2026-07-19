@@ -80,7 +80,7 @@ function ChannelOption({
           checked ? "text-[#00A58F]" : "text-[#B9C0BE]",
         ].join(" ")}
       >
-        {checked ? <HiCheck className="h-4 w-4" /> : null}
+        <HiCheck className="h-4 w-4" />
       </span>
       <span className="text-[14px] tracking-[-0.2px] text-[#494949]">
         {shortLabel}

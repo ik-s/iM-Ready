@@ -20,11 +20,9 @@ export function CheckMark({
         checked ? "bg-[#00A58F]" : "bg-[#CBD2D0]",
       ].join(" ")}
     >
-      {checked ? (
-        <HiCheck
-          className={size === "small" ? "h-3 w-3" : "h-4 w-4"}
-        />
-      ) : null}
+      <HiCheck
+        className={size === "small" ? "h-3 w-3" : "h-4 w-4"}
+      />
     </span>
   );
 }
