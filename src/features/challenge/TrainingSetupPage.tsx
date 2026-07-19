@@ -74,7 +74,7 @@ export function TrainingSetupPage() {
   const [notification, setNotification] =
     useState<NotificationValue>("none");
   const [trainingLevel, setTrainingLevel] = useState(2);
-  const [guardianMonitoring, setGuardianMonitoring] = useState(true);
+  const [guardianMonitoring, setGuardianMonitoring] = useState(false);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("21:00");
   const [showCompletion, setShowCompletion] = useState(false);

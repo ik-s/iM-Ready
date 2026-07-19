@@ -47,7 +47,7 @@ const introCards = [
 
 export function ServiceIntroPage() {
   const navigate = useNavigate();
-  const [acknowledged, setAcknowledged] = useState(true);
+  const [acknowledged, setAcknowledged] = useState(false);
 
   return (
     <div className="mobile-prototype bg-[#F7F8F8]">
@@ -127,7 +127,9 @@ export function ServiceIntroPage() {
               className="peer sr-only"
             />
             <span className="grid h-[22px] w-[22px] shrink-0 place-items-center rounded-[5px] bg-[#D0D6D4] text-white peer-checked:bg-[#00A58F]">
-              <HiCheck className="h-[15px] w-[15px]" />
+              {acknowledged ? (
+                <HiCheck className="h-[15px] w-[15px]" />
+              ) : null}
             </span>
             <span className="text-[14px] leading-[20px] font-semibold tracking-[-0.35px] text-[#222]">
               개인정보 활용 및 훈련 안내를 확인했습니다.

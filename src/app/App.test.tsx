@@ -118,13 +118,12 @@ describe("challenge onboarding routes", () => {
       name: "동의하고 시작하기",
     });
 
-    expect(acknowledgement).toBeChecked();
-    expect(continueButton).toBeEnabled();
-
-    await user.click(acknowledgement);
+    expect(acknowledgement).not.toBeChecked();
     expect(continueButton).toBeDisabled();
 
     await user.click(acknowledgement);
+    expect(acknowledgement).toBeChecked();
+    expect(continueButton).toBeEnabled();
     await user.click(continueButton);
 
     expect(
@@ -182,8 +181,11 @@ describe("challenge onboarding routes", () => {
     ]) {
       expect(
         screen.getByRole("checkbox", { name: label }),
-      ).toBeChecked();
+      ).not.toBeChecked();
     }
+    expect(
+      screen.getByRole("button", { name: "챌린지 하러가기" }),
+    ).toBeDisabled();
 
     expect(
       screen.getByText(
@@ -235,6 +237,19 @@ describe("challenge onboarding routes", () => {
       </MemoryRouter>,
     );
 
+    for (const label of [
+      "개인정보 수집이용에 관한 사항 [마케팅]",
+      "개인정보 제공에 관한 사항",
+      "상품서비스 안내 수단 [통합]",
+      "문자",
+      "전화",
+      "우편",
+    ]) {
+      await user.click(
+        screen.getByRole("checkbox", { name: label }),
+      );
+    }
+
     await user.click(
       screen.getByRole("button", { name: "챌린지 하러가기" }),
     );
@@ -283,10 +298,10 @@ describe("challenge onboarding routes", () => {
     const guardianMonitoring = screen.getByRole("checkbox", {
       name: "보호자 모니터링",
     });
-    expect(guardianMonitoring).toBeChecked();
+    expect(guardianMonitoring).not.toBeChecked();
 
     await user.click(guardianMonitoring);
-    expect(guardianMonitoring).not.toBeChecked();
+    expect(guardianMonitoring).toBeChecked();
 
     await user.click(
       screen.getByRole("button", { name: "설정 완료하기" }),

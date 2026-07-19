@@ -7,12 +7,12 @@ import { BottomTabBar } from "../../components/BottomTabBar";
 import { CheckMark } from "../../components/CheckMark";
 
 const initialSelections = {
-  collection: true,
-  provision: true,
-  channelGroup: true,
-  sms: true,
-  phone: true,
-  mail: true,
+  collection: false,
+  provision: false,
+  channelGroup: false,
+  sms: false,
+  phone: false,
+  mail: false,
 };
 
 const safeTrainingTerms = [
@@ -80,7 +80,7 @@ function ChannelOption({
           checked ? "text-[#00A58F]" : "text-[#B9C0BE]",
         ].join(" ")}
       >
-        <HiCheck className="h-4 w-4" />
+        {checked ? <HiCheck className="h-4 w-4" /> : null}
       </span>
       <span className="text-[14px] tracking-[-0.2px] text-[#494949]">
         {shortLabel}
