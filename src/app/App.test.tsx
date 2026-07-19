@@ -357,6 +357,9 @@ describe("challenge onboarding routes", () => {
     expect(
       screen.queryByRole("dialog", { name: "설정 완료" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "이번달 피싱 예방 결과" }),
+    ).toBeInTheDocument();
   });
 
   it("keeps the setup header fixed and centers only the profile identity", () => {

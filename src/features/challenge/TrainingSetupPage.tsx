@@ -4,6 +4,7 @@ import {
   HiOutlineExclamationTriangle,
   HiOutlineInformationCircle,
 } from "react-icons/hi2";
+import { useNavigate } from "react-router";
 
 import profileAvatar from "../../assets/figma/training-profile-avatar.png";
 import { AppHeader } from "../../components/AppHeader";
@@ -32,27 +33,32 @@ const trainingLevels = [
     value: 1,
     name: "기본형",
     pressure: "낮은 압박 수준",
-    description: "일반적인 피싱 상황을 경험할 수 있어요.",
+    description: "일반적인 피싱 상황을\n경험할 수 있어요.",
     tone: "neutral",
   },
   {
     value: 2,
     name: "실전형",
     pressure: "보통 압박 수준",
-    description: "실제 발생 사례와 유사한 상황으로 훈련해요",
+    description: "실제 발생 사례와 유사한\n상황으로 훈련해요",
     tone: "primary",
   },
   {
     value: 3,
     name: "고난도형",
     pressure: "높은 압박 수준",
-    description: "강한 협박과 심리적 압박이 포함된 고난도 훈련입니다.",
+    description: "강한 협박과 심리적 압박이\n포함된 고난도 훈련입니다.",
     tone: "danger",
   },
 ] as const;
 
 const completionMessage =
   "설정이 완료됐습니다! 훈련 기간동안 무작위 문자 혹은 전화가 발송될 예정입니다.";
+
+const timeOptions = Array.from(
+  { length: 24 },
+  (_, hour) => `${String(hour).padStart(2, "0")}:00`,
+);
 
 type NotificationValue = (typeof notificationOptions)[number]["value"];
 
@@ -71,6 +77,7 @@ function StepHeading({
 }
 
 export function TrainingSetupPage() {
+  const navigate = useNavigate();
   const [notification, setNotification] =
     useState<NotificationValue>("none");
   const [trainingLevel, setTrainingLevel] = useState(2);
@@ -185,12 +192,12 @@ export function TrainingSetupPage() {
                     aria-label={`Level ${level.value} ${level.name}, ${level.pressure}`}
                     onClick={() => setTrainingLevel(level.value)}
                     className={[
-                      "relative flex h-[107px] min-w-0 flex-col items-center rounded-[12px] px-[7px] pt-[12px] text-center transition active:scale-[0.98]",
+                      "relative box-border flex h-[122px] min-w-0 flex-col items-center rounded-[12px] border-2 px-[7px] pt-[12px] text-center transition active:scale-[0.98]",
                       selected
-                        ? "border-2 border-[#12C7B5] bg-[rgba(18,199,181,0.05)]"
+                        ? "border-[#12C7B5] bg-[rgba(18,199,181,0.05)]"
                         : isDanger
-                          ? "border border-[rgba(186,26,26,0.3)] bg-[rgba(255,218,214,0.1)]"
-                          : "border border-[rgba(187,202,196,0.3)] bg-[#FCF9F8]",
+                          ? "border-[rgba(186,26,26,0.3)] bg-[rgba(255,218,214,0.1)]"
+                          : "border-[rgba(187,202,196,0.3)] bg-[#FCF9F8]",
                     ].join(" ")}
                   >
                     {selected ? (
@@ -201,18 +208,20 @@ export function TrainingSetupPage() {
                     ) : null}
                     <span
                       className={[
-                        "text-[7px] leading-[15px] font-bold",
-                        isDanger ? "text-[#BA1A1A]" : "text-[#1B1C1C]",
+                        "text-[10.5px] leading-[18px] font-bold",
+                        isDanger && !selected
+                          ? "text-[#BA1A1A]"
+                          : "text-[#1B1C1C]",
                       ].join(" ")}
                     >
                       Level {level.value}
                     </span>
-                    <span className="text-[13px] leading-[15px] font-bold">
+                    <span className="text-[16.5px] leading-[20px] font-bold">
                       {level.name}
                     </span>
                     <span
                       className={[
-                        "mt-1 rounded-full px-[8px] text-[8px] leading-[18px] font-bold whitespace-nowrap",
+                        "mt-1 rounded-full px-[8px] text-[12px] leading-[18px] font-medium whitespace-nowrap",
                         selected
                           ? "bg-[rgba(18,199,181,0.1)] text-[#12C7B5]"
                           : isDanger
@@ -222,17 +231,17 @@ export function TrainingSetupPage() {
                     >
                       {level.pressure}
                     </span>
-                    <span className="mt-[6px] text-[7px] leading-[11px] text-[#3C4A45]">
+                    <span className="mt-[6px] w-full whitespace-pre-line text-[7px] leading-[11px] break-keep text-[#3C4A45]">
                       {level.description}
                     </span>
                   </button>
                 );
               })}
             </div>
-            <p className="mt-[10px] flex items-center gap-1 text-[11px] leading-[17px] font-medium text-[#BA1A1A]">
+            <p className="mt-[10px] flex items-center gap-1 text-[14px] leading-[22px] font-medium text-[#BA1A1A]">
               <HiOutlineExclamationTriangle
                 aria-hidden="true"
-                className="h-[11px] w-[11px] shrink-0"
+                className="h-4 w-4 shrink-0"
               />
               Level 3는 높은 심리적 압박을 포함할 수 있습니다.
             </p>
@@ -271,9 +280,11 @@ export function TrainingSetupPage() {
                     onChange={(event) => setStartTime(event.target.value)}
                     className="h-[22px] w-[58px] appearance-none rounded-xl border border-[rgba(187,202,196,0.4)] bg-[#FCF9F8] px-2 text-center text-[10px] text-[#1B1C1C]"
                   >
-                    <option>08:00</option>
-                    <option>09:00</option>
-                    <option>10:00</option>
+                    {timeOptions.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
                   </select>
                 </label>
                 <span className="text-[16px] leading-6 text-[#3C4A45]">~</span>
@@ -285,9 +296,11 @@ export function TrainingSetupPage() {
                     onChange={(event) => setEndTime(event.target.value)}
                     className="h-[22px] w-[58px] appearance-none rounded-xl border border-[rgba(187,202,196,0.4)] bg-[#FCF9F8] px-2 text-center text-[10px] text-[#1B1C1C]"
                   >
-                    <option>20:00</option>
-                    <option>21:00</option>
-                    <option>22:00</option>
+                    {timeOptions.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
                   </select>
                 </label>
               </div>
@@ -342,7 +355,10 @@ export function TrainingSetupPage() {
             </p>
             <button
               type="button"
-              onClick={() => setShowCompletion(false)}
+              onClick={() => {
+                setShowCompletion(false);
+                navigate("/home");
+              }}
               className="mt-6 h-11 w-full rounded-[12px] bg-[#029C82] text-[16px] font-semibold text-white"
             >
               확인

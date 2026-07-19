@@ -158,7 +158,7 @@ export function GoldenTimeHomePage() {
             clearEmergencyResponseComplete();
             setHasActiveIncident(false);
           }}
-          className="mb-6 block w-full text-center text-[19px] leading-[28px] font-semibold tracking-[-0.5px] text-[#6A6A6A]"
+          className="mb-6 block w-full text-center text-[12px] leading-[18px] font-semibold tracking-[-0.5px] text-[#6A6A6A]"
         >
           <span className="mx-auto mb-[7px] block h-px w-[63px] bg-[#9D9D9D]" />
           다시 긴급 대응하기
