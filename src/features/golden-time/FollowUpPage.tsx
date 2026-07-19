@@ -9,11 +9,7 @@ import {
 } from "react-icons/pi";
 import { useNavigate } from "react-router";
 
-import {
-  GoldenActionSheet,
-  GoldenToast,
-  useGoldenToast,
-} from "./GoldenFeedback";
+import { GoldenActionSheet } from "./GoldenFeedback";
 import { GoldenDivider, GoldenTimeShell } from "./GoldenTimeShell";
 
 const checklist = [
@@ -31,7 +27,6 @@ export function FollowUpPage() {
   const [sheet, setSheet] = useState<
     "certificate" | "written" | "document" | null
   >(null);
-  const documentNotice = useGoldenToast();
   const navigate = useNavigate();
 
   const toggle = (id: string) => {
@@ -145,14 +140,8 @@ export function FollowUpPage() {
           )}
         </div>
         <button
-          ref={documentNotice.triggerRef}
           type="button"
-          onClick={() => {
-            setSheet("document");
-            documentNotice.showToast(
-              "피해경위서 초안을 작성했습니다.",
-            );
-          }}
+          onClick={() => setSheet("document")}
           className="mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-[#029C82] font-['Jua'] text-[18px] text-white"
         >
           <PiFileText className="h-5 w-5" />
@@ -250,12 +239,6 @@ export function FollowUpPage() {
         ) : null}
       </GoldenActionSheet>
 
-      <GoldenToast
-        id={documentNotice.toastId}
-        message={documentNotice.message}
-        onClose={documentNotice.dismissToast}
-        toastRef={documentNotice.toastRef}
-      />
     </GoldenTimeShell>
   );
 }

@@ -1017,7 +1017,7 @@ describe("home report and golden time routes", () => {
     ).toBeInTheDocument();
   });
 
-  it("dismisses the follow-up document notice when the user clicks elsewhere", async () => {
+  it("opens the follow-up document draft without showing a toast", async () => {
     const user = userEvent.setup();
 
     render(
@@ -1030,101 +1030,11 @@ describe("home report and golden time routes", () => {
       screen.getByRole("button", { name: "피해경위서 자동 작성" }),
     );
     expect(
-      screen.getByText("피해경위서 초안을 작성했습니다."),
+      screen.getByRole("dialog", { name: "피해경위서 초안" }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByText("데모용 피해경위서를 자동으로 작성했습니다."),
-    ).not.toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole("heading", { name: "후속 절차 가이드" }),
-    );
     expect(
       screen.queryByText("피해경위서 초안을 작성했습니다."),
     ).not.toBeInTheDocument();
-  });
-
-  it("keeps the follow-up document notice visible through its trigger pointer sequence", () => {
-    render(
-      <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
-        <App />
-      </MemoryRouter>,
-    );
-
-    const createDocumentButton = screen.getByRole("button", {
-      name: "피해경위서 자동 작성",
-    });
-    fireEvent.click(createDocumentButton);
-    fireEvent.pointerDown(createDocumentButton);
-
-    expect(
-      screen.getByText("피해경위서 초안을 작성했습니다."),
-    ).toBeInTheDocument();
-  });
-
-  it("arms follow-up notice outside dismissal after the trigger gesture completes", () => {
-    vi.useFakeTimers();
-
-    try {
-      render(
-        <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
-          <App />
-        </MemoryRouter>,
-      );
-
-      const createDocumentButton = screen.getByRole("button", {
-        name: "피해경위서 자동 작성",
-      });
-      const pageHeading = screen.getByRole("heading", {
-        name: "후속 절차 가이드",
-      });
-
-      fireEvent.click(createDocumentButton);
-      fireEvent.pointerDown(pageHeading);
-      expect(
-        screen.getByText("피해경위서 초안을 작성했습니다."),
-      ).toBeInTheDocument();
-
-      act(() => {
-        vi.advanceTimersByTime(0);
-      });
-      fireEvent.pointerDown(pageHeading);
-      expect(
-        screen.queryByText("피해경위서 초안을 작성했습니다."),
-      ).not.toBeInTheDocument();
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
-  it("automatically dismisses the follow-up document notice after three seconds", () => {
-    vi.useFakeTimers();
-
-    try {
-      render(
-        <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
-          <App />
-        </MemoryRouter>,
-      );
-
-      fireEvent.click(
-        screen.getByRole("button", {
-          name: "피해경위서 자동 작성",
-        }),
-      );
-      expect(
-        screen.getByText("피해경위서 초안을 작성했습니다."),
-      ).toBeInTheDocument();
-
-      act(() => {
-        vi.advanceTimersByTime(3_000);
-      });
-      expect(
-        screen.queryByText("피해경위서 초안을 작성했습니다."),
-      ).not.toBeInTheDocument();
-    } finally {
-      vi.useRealTimers();
-    }
   });
 
   it("labels the follow-up incident entry as an active phishing response", () => {
