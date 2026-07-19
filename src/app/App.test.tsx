@@ -1017,6 +1017,28 @@ describe("home report and golden time routes", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows placeholder notices for product and all tabs outside golden time", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/consent"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "상품" }));
+    expect(
+      screen.getByText("상품 메뉴는 준비 중입니다."),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "전체" }));
+    expect(
+      screen.getByText("전체 메뉴는 준비 중입니다."),
+    ).toBeInTheDocument();
+  });
+
   it("does not show the training banner on the golden time start page", () => {
     render(
       <MemoryRouter initialEntries={["/golden-time/start"]}>

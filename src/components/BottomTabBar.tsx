@@ -8,6 +8,8 @@ import {
 } from "react-icons/pi";
 import { useNavigate } from "react-router";
 
+import { NoticeToast, useNoticeToast } from "./NoticeToast";
+
 export type BottomTabId =
   | "home"
   | "product"
@@ -52,51 +54,63 @@ export function BottomTabBar({
   onNotice,
 }: BottomTabBarProps) {
   const navigate = useNavigate();
+  const internalNotice = useNoticeToast();
+  const showNotice = onNotice ?? internalNotice.showToast;
 
   return (
-    <nav
-      aria-label="주요 메뉴"
-      style={{ bottom: `${bottomOffset}px` }}
-      className="bottom-tabs h-[82px] rounded-t-[14px] bg-white shadow-[0_-5px_18px_rgba(35,58,53,0.07)]"
-    >
-      <ul className="grid h-full grid-cols-5 px-[14px] pt-[8px]">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const active = tab.id === activeTab;
+    <>
+      <nav
+        aria-label="주요 메뉴"
+        style={{ bottom: `${bottomOffset}px` }}
+        className="bottom-tabs h-[82px] rounded-t-[14px] bg-white shadow-[0_-5px_18px_rgba(35,58,53,0.07)]"
+      >
+        <ul className="grid h-full grid-cols-5 px-[14px] pt-[8px]">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const active = tab.id === activeTab;
 
-          return (
-            <li key={tab.label} className="flex justify-center">
-              <button
-                type="button"
-                aria-current={active ? "page" : undefined}
-                onClick={() => {
-                  if (tab.route) {
-                    navigate(tab.route);
-                    return;
-                  }
+            return (
+              <li key={tab.label} className="flex justify-center">
+                <button
+                  type="button"
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => {
+                    if (tab.route) {
+                      navigate(tab.route);
+                      return;
+                    }
 
-                  onNotice?.(
-                    tab.id === "product"
-                      ? "상품 메뉴는 준비 중입니다."
-                      : "전체 메뉴는 준비 중입니다.",
-                  );
-                }}
-                className={[
-                  "flex h-[58px] min-w-[52px] flex-col items-center justify-center gap-[4px] rounded-[24px] px-[8px]",
-                  active
-                    ? "min-w-[64px] bg-[#D1E4E1] text-[#00BFA6]"
-                    : "text-[#3C4A45]",
-                ].join(" ")}
-              >
-                <Icon aria-hidden="true" className="h-6 w-6" />
-                <span className="text-[12px] leading-none font-medium">
-                  {tab.label}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+                    showNotice(
+                      tab.id === "product"
+                        ? "상품 메뉴는 준비 중입니다."
+                        : "전체 메뉴는 준비 중입니다.",
+                    );
+                  }}
+                  className={[
+                    "flex h-[58px] min-w-[52px] flex-col items-center justify-center gap-[4px] rounded-[24px] px-[8px]",
+                    active
+                      ? "min-w-[64px] bg-[#D1E4E1] text-[#00BFA6]"
+                      : "text-[#3C4A45]",
+                  ].join(" ")}
+                >
+                  <Icon aria-hidden="true" className="h-6 w-6" />
+                  <span className="text-[12px] leading-none font-medium">
+                    {tab.label}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+      {onNotice ? null : (
+        <NoticeToast
+          id={internalNotice.toastId}
+          message={internalNotice.message}
+          onClose={internalNotice.dismissToast}
+          toastRef={internalNotice.toastRef}
+        />
+      )}
+    </>
   );
 }
