@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  PiBank,
   PiCaretRight,
   PiCheck,
   PiFileText,
@@ -10,6 +9,7 @@ import {
 import { useNavigate } from "react-router";
 
 import { GoldenActionSheet } from "./GoldenFeedback";
+import { markEmergencyResponseComplete } from "./goldenTimeSession";
 import { GoldenDivider, GoldenTimeShell } from "./GoldenTimeShell";
 
 const checklist = [
@@ -149,29 +149,25 @@ export function FollowUpPage() {
         </button>
       </section>
 
-      <button
-        type="button"
-        aria-label="진행 중인 사건 진행 중인 피싱 대응 조회"
-        onClick={() =>
-          navigate("/golden-time/incidents", {
-            state: { backTo: "/golden-time/follow-up" },
-          })
-        }
-        className="flex w-full items-center justify-between border-b border-[#E8ECEB] bg-white px-5 py-5 text-left"
-      >
-        <span className="flex items-center gap-3">
-          <PiBank className="h-6 w-6" />
-          <span>
-            <span className="block text-[15px] font-semibold">
-              진행 중인 사건
-            </span>
-            <span className="block text-[12px] text-[#3C4A45]">
-              진행 중인 피싱 대응 조회
-            </span>
-          </span>
-        </span>
-        <PiCaretRight className="text-[#98A4A0]" />
-      </button>
+      <section className="border-b border-[#E8ECEB] bg-white px-5 py-5">
+        <p className="text-[12px] tracking-[0.6px] text-[#66736E]">
+          진행 중인 사건
+        </p>
+        <p className="mt-2 text-[14px] leading-[21px] text-[#3C4A45]">
+          긴급 대응 절차를 마치면 골든타임 홈에서 진행 현황을 확인할 수
+          있습니다.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            markEmergencyResponseComplete();
+            navigate("/golden-time");
+          }}
+          className="mt-4 flex h-[52px] w-full items-center justify-center rounded-[8px] border border-[#029C82] bg-white font-['Jua'] text-[18px] text-[#029C82]"
+        >
+          완료하기
+        </button>
+      </section>
 
       <div className="p-5">
         <section className="rounded-[14px] border border-[#CDE7E1] bg-gradient-to-br from-[#ECFBF7] to-white p-4">
@@ -238,7 +234,6 @@ export function FollowUpPage() {
           </dl>
         ) : null}
       </GoldenActionSheet>
-
     </GoldenTimeShell>
   );
 }

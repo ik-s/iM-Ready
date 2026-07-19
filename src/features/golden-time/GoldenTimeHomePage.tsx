@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   PiCaretRight,
   PiGearSix,
@@ -8,91 +9,100 @@ import {
 import { useNavigate } from "react-router";
 
 import { currentIncident } from "./goldenTimeDemoData";
+import {
+  clearEmergencyResponseComplete,
+  isEmergencyResponseComplete,
+} from "./goldenTimeSession";
 import { GoldenDivider, GoldenTimeShell } from "./GoldenTimeShell";
 
 export function GoldenTimeHomePage() {
   const navigate = useNavigate();
+  const [hasActiveIncident, setHasActiveIncident] = useState(() =>
+    isEmergencyResponseComplete(),
+  );
 
   return (
     <GoldenTimeShell backTo="/home" mainClassName="bg-white">
-      <section className="px-5 pt-7 pb-6">
-        <p className="flex items-center gap-1 text-[12px] font-semibold text-[#E53935]">
-          <PiSiren className="h-4 w-4" />
-          긴급 대응 절차 안내
-        </p>
-        <h1 className="mt-[6px] text-[25px] leading-[34px] font-extrabold tracking-[-0.6px]">
-          보이스피싱 긴급 대응
-        </h1>
-        <p className="mt-1 text-[14px] leading-[21px] text-[#3C4A45]">
-          필요한 보호·신고 절차를 순서대로 안내합니다.
-        </p>
-        <button
-          type="button"
-          onClick={() => navigate("/golden-time/start")}
-          className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-[10px] bg-[#E53935] font-['Jua'] text-[20px] text-white shadow-[0_2px_4px_rgba(186,26,26,0.18)]"
-        >
-          <PiSiren className="h-5 w-5" />
-          긴급 대응 시작하기
-        </button>
-      </section>
-
-      <GoldenDivider />
-
-      <section className="px-5 pt-5 pb-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[18px] font-bold">진행 중인 사건</h2>
+      {hasActiveIncident ? (
+        <section className="px-5 pt-5 pb-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[18px] font-bold">진행 중인 사건</h2>
+            <button
+              type="button"
+              onClick={() => navigate("/golden-time/incidents")}
+              className="flex items-center gap-1 text-[12px] text-[#3C4A45]"
+            >
+              전체보기 <PiCaretRight />
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => navigate("/golden-time/incidents")}
-            className="flex items-center gap-1 text-[12px] text-[#3C4A45]"
+            className="mt-3 w-full border-b border-[#E8ECEB] bg-white py-3 text-left"
           >
-            전체보기 <PiCaretRight />
+            <div className="flex items-center justify-between text-[12px]">
+              <span className="text-[#3C4A45]">
+                {currentIncident.occurredAtShort}
+              </span>
+              <span className="font-semibold text-[#BA1A1A]">
+                {currentIncident.dueLabel}
+              </span>
+            </div>
+            <div className="mt-[9px] flex items-end justify-between">
+              <p className="text-[16px] font-bold">
+                {currentIncident.title}
+              </p>
+              <PiCaretRight className="h-4 w-4 text-[#66736E]" />
+            </div>
+            <div className="mt-3 rounded-[8px] bg-[#F4F7F6] px-3 py-[10px]">
+              <p className="text-[10px] font-semibold text-[#029C82]">
+                다음 단계
+              </p>
+              <p className="mt-[2px] text-[13px] font-semibold">
+                {currentIncident.nextStep}
+              </p>
+            </div>
+            <div
+              role="progressbar"
+              aria-label="진행 중인 사건 진행률"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={currentIncident.progress}
+              className="mt-3 h-1 overflow-hidden rounded-full bg-[#E8ECEB]"
+            >
+              <span
+                className="block h-full rounded-full bg-[#029C82]"
+                style={{ width: `${currentIncident.progress}%` }}
+              />
+            </div>
           </button>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate("/golden-time/incidents")}
-          className="mt-3 w-full border-b border-[#E8ECEB] bg-white py-3 text-left"
-        >
-          <div className="flex items-center justify-between text-[12px]">
-            <span className="text-[#3C4A45]">
-              {currentIncident.occurredAtShort}
-            </span>
-            <span className="font-semibold text-[#BA1A1A]">
-              {currentIncident.dueLabel}
-            </span>
-          </div>
-          <div className="mt-[9px] flex items-end justify-between">
-            <p className="text-[16px] font-bold">
-              {currentIncident.title}
-            </p>
-            <PiCaretRight className="h-4 w-4 text-[#66736E]" />
-          </div>
-          <div className="mt-3 rounded-[8px] bg-[#F4F7F6] px-3 py-[10px]">
-            <p className="text-[10px] font-semibold text-[#029C82]">
-              다음 단계
-            </p>
-            <p className="mt-[2px] text-[13px] font-semibold">
-              {currentIncident.nextStep}
-            </p>
-          </div>
-          <div
-            role="progressbar"
-            aria-label="진행 중인 사건 진행률"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={currentIncident.progress}
-            className="mt-3 h-1 overflow-hidden rounded-full bg-[#E8ECEB]"
+        </section>
+      ) : (
+        <section className="px-5 pt-7 pb-6">
+          <p className="flex items-center gap-1 text-[12px] font-semibold text-[#E53935]">
+            <PiSiren className="h-4 w-4" />
+            긴급 대응 절차 안내
+          </p>
+          <h1 className="mt-[6px] text-[25px] leading-[34px] font-extrabold tracking-[-0.6px]">
+            보이스피싱 긴급 대응
+          </h1>
+          <p className="mt-1 text-[14px] leading-[21px] text-[#3C4A45]">
+            필요한 보호·신고 절차를 순서대로 안내합니다.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/golden-time/start")}
+            className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-[10px] bg-[#E53935] font-['Jua'] text-[20px] text-white shadow-[0_2px_4px_rgba(186,26,26,0.18)]"
           >
-            <span
-              className="block h-full rounded-full bg-[#029C82]"
-              style={{ width: `${currentIncident.progress}%` }}
-            />
-          </div>
-        </button>
-      </section>
+            <PiSiren className="h-5 w-5" />
+            긴급 대응 시작하기
+          </button>
+        </section>
+      )}
 
-      <section className="grid grid-cols-2 gap-3 px-5 pb-4">
+      <GoldenDivider />
+
+      <section className="grid grid-cols-2 gap-3 px-5 pb-4 pt-5">
         <button
           type="button"
           onClick={() => navigate("/golden-time/history")}
@@ -140,6 +150,20 @@ export function GoldenTimeHomePage() {
         </div>
         <PiShieldCheck className="ml-auto h-5 w-5 text-[#029C82]" />
       </div>
+
+      {hasActiveIncident ? (
+        <button
+          type="button"
+          onClick={() => {
+            clearEmergencyResponseComplete();
+            setHasActiveIncident(false);
+          }}
+          className="mb-6 block w-full text-center text-[12px] leading-[18px] font-semibold tracking-[-0.5px] text-[#6A6A6A]"
+        >
+          <span className="mx-auto mb-[7px] block h-px w-[63px] bg-[#9D9D9D]" />
+          다시 긴급 대응하기
+        </button>
+      ) : null}
     </GoldenTimeShell>
   );
 }

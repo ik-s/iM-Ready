@@ -5,6 +5,7 @@ import {
   PiShareNetwork,
   PiShieldCheck,
 } from "react-icons/pi";
+import { useNavigate } from "react-router";
 
 import reportCase from "../../assets/figma/home/report-case.png";
 import reportCharacter from "../../assets/figma/home/report-character.png";
@@ -34,6 +35,7 @@ const preventionTips = [
 const NOTICE_DURATION_MS = 3_000;
 
 export function HomeReportPage() {
+  const navigate = useNavigate();
   const [notice, setNotice] = useState("");
   const noticeRef = useRef<HTMLParagraphElement>(null);
 
@@ -79,23 +81,25 @@ export function HomeReportPage() {
       />
       <AppHeader sticky={false} transparent />
       <main className="relative z-10 px-5 pt-3">
-        <section className="relative h-[110px] overflow-hidden rounded-[22px] border border-[#D7E7E3] bg-gradient-to-br from-white to-[#D6FFF6] px-5 pt-[18px] shadow-[0_3px_5px_rgba(45,88,78,0.12)]">
+        <button
+          type="button"
+          onClick={() => navigate("/invites/phishing-challenge/demo")}
+          className="relative block h-[110px] w-full overflow-hidden rounded-[22px] border border-[#D7E7E3] bg-gradient-to-br from-white to-[#D6FFF6] px-5 pt-[18px] text-left shadow-[0_3px_5px_rgba(45,88,78,0.12)]"
+        >
           <h1 className="relative z-10 text-[15px] leading-[21px] font-bold tracking-[-0.3px]">
-            이번 달도 AI 사기범이
+            이번 달도 AI 사기꾼이
             <br />
             예고 없이 찾아옵니다
           </h1>
-          <p className="relative z-10 mt-[7px] text-[10px] leading-[15px] text-[#3C4A45]">
-            계속되는 신종 AI 피싱,
-            <br />
-            함께 대비해요!
+          <p className="relative z-10 mt-[7px] whitespace-nowrap text-[10px] leading-[15px] text-[#3C4A45]">
+            계속되는 신종 AI 피싱, 함께 대비해요!
           </p>
           <img
             src={reportHero}
             alt=""
-            className="absolute top-[-32px] right-[-8px] h-[174px] w-[116px] object-contain"
+            className="pointer-events-none absolute top-[-32px] right-[-8px] h-[174px] w-[116px] object-contain"
           />
-        </section>
+        </button>
 
         <article className="relative mt-[22px] min-h-[644px] rounded-[24px] bg-white px-5 pt-4 pb-6 shadow-[0_4px_7px_rgba(34,62,56,0.17)]">
           <div className="flex items-start justify-between">

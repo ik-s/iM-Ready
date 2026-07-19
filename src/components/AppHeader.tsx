@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 import brandMark from "../assets/figma/share-character-left.png";
 import bellIcon from "../assets/figma/header-logo.svg";
+import { NoticeToast, useNoticeToast } from "./NoticeToast";
 
 type AppHeaderProps = {
   backTo?: string;
@@ -20,6 +21,8 @@ export function AppHeader({
   transparent = false,
 }: AppHeaderProps) {
   const navigate = useNavigate();
+  const internalNotice = useNoticeToast();
+  const showNotice = onNotice ?? internalNotice.showToast;
 
   return (
     <>
@@ -73,7 +76,7 @@ export function AppHeader({
           type="button"
           aria-label="알림"
           onClick={() =>
-            onNotice?.("새로운 알림은 아직 없습니다.")
+            showNotice("새로운 알림은 아직 없습니다.")
           }
           className="grid h-10 w-10 shrink-0 place-items-center rounded-full"
         >
@@ -81,6 +84,14 @@ export function AppHeader({
         </button>
       </header>
       {fixed ? <div aria-hidden="true" className="h-14" /> : null}
+      {onNotice ? null : (
+        <NoticeToast
+          id={internalNotice.toastId}
+          message={internalNotice.message}
+          onClose={internalNotice.dismissToast}
+          toastRef={internalNotice.toastRef}
+        />
+      )}
     </>
   );
 }

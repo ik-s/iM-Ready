@@ -7,8 +7,9 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { clearEmergencyResponseComplete } from "../features/golden-time/goldenTimeSession";
 import { App } from "./App";
 
 describe("challenge onboarding routes", () => {
@@ -226,6 +227,42 @@ describe("challenge onboarding routes", () => {
     expect(noticeSection).toHaveClass("min-h-[450px]", "pb-[36px]");
   });
 
+  it("opens consent terms from the label and checks after agreeing", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/consent"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "개인정보 수집이용에 관한 사항 [마케팅]",
+      }),
+    );
+
+    expect(
+      screen.getByRole("dialog", {
+        name: "개인정보 수집이용에 관한 사항 [마케팅]",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("1. 수집·이용 목적"),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "동의하기" }));
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: "개인정보 수집이용에 관한 사항 [마케팅]",
+      }),
+    ).toBeChecked();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("moves from consent to the challenge training settings", async () => {
     const user = userEvent.setup();
 
@@ -241,13 +278,13 @@ describe("challenge onboarding routes", () => {
       "개인정보 수집이용에 관한 사항 [마케팅]",
       "개인정보 제공에 관한 사항",
       "상품서비스 안내 수단 [통합]",
-      "문자",
-      "전화",
-      "우편",
     ]) {
-      await user.click(
-        screen.getByRole("checkbox", { name: label }),
-      );
+      await user.click(screen.getByRole("checkbox", { name: label }));
+      await user.click(screen.getByRole("button", { name: "동의하기" }));
+    }
+
+    for (const label of ["문자", "전화", "우편"]) {
+      await user.click(screen.getByRole("checkbox", { name: label }));
     }
 
     await user.click(
@@ -320,6 +357,9 @@ describe("challenge onboarding routes", () => {
     expect(
       screen.queryByRole("dialog", { name: "설정 완료" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "이번달 피싱 예방 결과" }),
+    ).toBeInTheDocument();
   });
 
   it("keeps the setup header fixed and centers only the profile identity", () => {
@@ -414,6 +454,9 @@ describe("challenge onboarding routes", () => {
 });
 
 describe("home report and golden time routes", () => {
+  beforeEach(() => {
+    clearEmergencyResponseComplete();
+  });
   it("lets the home report header scroll away with the page", () => {
     render(
       <MemoryRouter initialEntries={["/home"]}>
@@ -1017,6 +1060,43 @@ describe("home report and golden time routes", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows placeholder notices for product and all tabs outside golden time", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter
+        initialEntries={["/events/phishing-challenge/consent"]}
+      >
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "상품" }));
+    expect(
+      screen.getByText("상품 메뉴는 준비 중입니다."),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "전체" }));
+    expect(
+      screen.getByText("전체 메뉴는 준비 중입니다."),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a notice toast when the header bell is pressed outside golden time", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/home"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "알림" }));
+    expect(
+      screen.getByText("새로운 알림은 아직 없습니다."),
+    ).toBeInTheDocument();
+  });
+
   it("does not show the training banner on the golden time start page", () => {
     render(
       <MemoryRouter initialEntries={["/golden-time/start"]}>
@@ -1052,6 +1132,26 @@ describe("home report and golden time routes", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("hides the active incident progress until emergency response is completed", () => {
+    render(
+      <MemoryRouter initialEntries={["/golden-time"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "긴급 대응 시작하기" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "진행 중인 사건" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("progressbar", {
+        name: "진행 중인 사건 진행률",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
   it("labels the follow-up incident entry as an active phishing response", () => {
     render(
       <MemoryRouter initialEntries={["/golden-time/follow-up"]}>
@@ -1059,10 +1159,9 @@ describe("home report and golden time routes", () => {
       </MemoryRouter>,
     );
 
+    expect(screen.getByText("진행 중인 사건")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", {
-        name: "진행 중인 사건 진행 중인 피싱 대응 조회",
-      }),
+      screen.getByRole("button", { name: "완료하기" }),
     ).toBeInTheDocument();
     expect(
       screen.queryByText("명의도용 확인 (payinfo)"),
@@ -1072,7 +1171,7 @@ describe("home report and golden time routes", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("returns from incidents to follow-up when opened from follow-up", async () => {
+  it("completes follow-up and shows the active incident on golden time home", async () => {
     const user = userEvent.setup();
 
     render(
@@ -1081,21 +1180,33 @@ describe("home report and golden time routes", () => {
       </MemoryRouter>,
     );
 
-    await user.click(
-      screen.getByRole("button", {
-        name: "진행 중인 사건 진행 중인 피싱 대응 조회",
-      }),
-    );
+    await user.click(screen.getByRole("button", { name: "완료하기" }));
+
     expect(
-      screen.getByRole("heading", { name: "진행 중 사건" }),
+      screen.getByRole("heading", { name: "진행 중인 사건" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("progressbar", {
+        name: "진행 중인 사건 진행률",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "긴급 대응 시작하기" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("긴급 대응 절차 안내"),
+    ).not.toBeInTheDocument();
 
     await user.click(
-      screen.getByRole("button", { name: "이전 화면" }),
+      screen.getByRole("button", { name: "다시 긴급 대응하기" }),
     );
+
     expect(
-      screen.getByRole("heading", { name: "후속 절차 가이드" }),
+      screen.getByRole("button", { name: "긴급 대응 시작하기" }),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "진행 중인 사건" }),
+    ).not.toBeInTheDocument();
   });
 
   it.each([

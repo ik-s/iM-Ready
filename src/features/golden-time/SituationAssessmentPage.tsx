@@ -93,11 +93,7 @@ export function SituationAssessmentPage() {
               key={option.id}
               className={[
                 "flex min-h-[88px] cursor-pointer items-center justify-between border-b border-[#E8ECEB] px-5 py-4",
-                checked
-                  ? "bg-[#F0FBF8]"
-                  : option.id === "now"
-                    ? "bg-[#F5FCFA]"
-                    : "bg-white",
+                checked ? "bg-[#F0FBF8]" : "bg-white",
               ].join(" ")}
             >
               <input
