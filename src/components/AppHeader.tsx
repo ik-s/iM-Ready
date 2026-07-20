@@ -67,7 +67,7 @@ export function AppHeader({
               <img src={brandMark} alt="" />
             </span>
             <span className="truncate text-[22px] font-bold tracking-[-0.35px] text-[#00BFA6]">
-              iM Ready
+              iM Shield
             </span>
           </button>
         </div>

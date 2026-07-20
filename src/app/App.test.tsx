@@ -28,8 +28,8 @@ describe("challenge onboarding routes", () => {
     const homeButton = screen.getByRole("button", {
       name: "홈으로 이동",
     });
-    expect(homeButton).toHaveTextContent("iM Ready");
-    expect(screen.queryByText("iM Shield")).not.toBeInTheDocument();
+    expect(homeButton).toHaveTextContent("iM Shield");
+    expect(screen.queryByText("iM Ready")).not.toBeInTheDocument();
 
     const navigation = screen.getByRole("navigation", {
       name: "주요 메뉴",
